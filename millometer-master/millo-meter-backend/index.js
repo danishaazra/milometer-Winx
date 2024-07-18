@@ -74,17 +74,19 @@ app.post("/api/otp", async (req, res) => {
   const { phone } = req.body;
 
   try {
-    const otp = otpGenerator.generate(6, {
-      digits: true,
-      alphabets: false,
-      upperCase: false,
-      specialChars: false,
-    });
     // Save the OTP in the user's record for later verification
     const user = await User.findOne({ phone });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    const otp = otpGenerator.generate(6, {
+          digits: true,
+          alphabets: false,
+          upperCase: false,
+          specialChars: false,
+        });
+
     user.otp = otp; // Store the OTP in the user record
     await user.save();
 
