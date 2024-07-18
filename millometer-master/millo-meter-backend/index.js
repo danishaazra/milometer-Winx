@@ -92,7 +92,7 @@ app.post("/api/otp", async (req, res) => {
 
     // // This is the logic to sent notification, for now just remove first, since one otp message is RM1
     // await client.messages.create({
-    //   body: `Your OTP is: ${otp}`,
+    //   body: Your OTP is: ${otp},
     //   to: phone,
     //   from: process.env.TWILIO_PHONE_NUMBER,
     // });
