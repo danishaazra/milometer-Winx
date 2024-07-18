@@ -53,12 +53,12 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  List<Widget> _widgetOptions = <Widget>[
-    UserList(),
-    HomeWidget(
+  final List<Widget> _widgetOptions = <Widget>[
+    const UserList(),
+    const HomeWidget(
       millID: '',
     ),
-    Settings(),
+    const Settings(),
   ];
 
   @override
@@ -72,7 +72,7 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: Text(
           appBarTitle,
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -85,7 +85,7 @@ class _MainPageState extends State<MainPage> {
                 child: SingleChildScrollView(
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     _widgetOptions.elementAt(_selectedIndex),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Flexible(
