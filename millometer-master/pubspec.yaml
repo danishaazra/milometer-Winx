@@ -41,6 +41,7 @@ dependencies:
   syncfusion_flutter_charts: ^22.2.5
   syncfusion_flutter_datepicker: ^22.2.5
   intl: ^0.18.0
+  http: ^1.2.1
   
   
   
