@@ -1,14 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:mill_project/widgets/adduser.dart';
 
 class UserList extends StatefulWidget {
-  const UserList({super.key});
+  final String millID;
+  const UserList({super.key, required this.millID});
 
   @override
   State<UserList> createState() => _UserListState();
 }
 
 class _UserListState extends State<UserList> {
+  List<Map<String, dynamic>> users = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsers();
+  }
+
+  Future<void> _fetchUsers() async {
+    final response = await http
+        .get(Uri.parse('http://localhost:3000/users/${widget.millID}'));
+    if (response.statusCode == 200) {
+      setState(() {
+        users = List<Map<String, dynamic>>.from(json.decode(response.body));
+      });
+    } else {
+      throw Exception('Failed to load users');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Flexible(
@@ -20,36 +43,13 @@ class _UserListState extends State<UserList> {
           children: [
             Positioned.fill(
               child: ListView(
-                children: [
-                  User(
-                    name: 'User 1',
-                    phoneNum: '+60123456789',
-                    status: 1,
-                  ),
-                  User(
-                    name: 'User 2',
-                    phoneNum: '+60123456781',
-                    status: 0,
-                  ),
-                  User(
-                    name: 'Engineer 1',
-                    phoneNum: '+60123456782',
-                    status: 1,
-                  ),
-                  User(
-                    name: 'Engineer 2',
-                    phoneNum: '+60123456783',
-                  ),
-                  User(
-                    name: 'User 3',
-                    phoneNum: '+60123456784',
-                  ),
-                  User(
-                    name: 'User 4',
-                    phoneNum: '+60123456785',
-                    status: 1,
-                  ),
-                ],
+                children: users
+                    .map((user) => User(
+                          name: user['name'],
+                          phoneNum: user['phoneNum'],
+                          status: user['status'],
+                        ))
+                    .toList(),
               ),
             ),
             Align(
@@ -57,8 +57,12 @@ class _UserListState extends State<UserList> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: FloatingActionButton(
-                  onPressed: () {
-                    _showAddUserScreen(context);
+                  onPressed: () async {
+                    final result = await _showAddUserScreen(context);
+                    if (result != null) {
+                      await _addUser(result);
+                      _fetchUsers(); // Refresh the list after adding a user
+                    }
                   },
                   child: Icon(Icons.add),
                 ),
@@ -70,13 +74,27 @@ class _UserListState extends State<UserList> {
     );
   }
 
-  void _showAddUserScreen(BuildContext context) {
-    // Use Navigator to push a new widget onto the screen when long-pressed
-    Navigator.push(
+  Future<void> _addUser(Map<String, dynamic> user) async {
+    user['millID'] = widget.millID;
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/users'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(user),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to add user');
+    }
+  }
+
+  Future<Map<String, dynamic>?> _showAddUserScreen(BuildContext context) async {
+    return await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
         builder: (context) {
-          return AddUser(); // Replace 'DetailScreen' with the widget you want to show
+          return AddUser();
         },
       ),
     );
@@ -150,7 +168,11 @@ class _UserState extends State<User> {
 
   Icon _statusIcon(int value) {
     if (value == 0) {
-      return Icon(Icons.circle, color: Color.fromARGB(255, 169, 169, 169),size: 10,);
+      return Icon(
+        Icons.circle,
+        color: Color.fromARGB(255, 169, 169, 169),
+        size: 10,
+      );
     } else if (value == 1) {
       return Icon(
         Icons.circle,
@@ -158,7 +180,11 @@ class _UserState extends State<User> {
         size: 10,
       );
     } else {
-      return Icon(Icons.circle, color: Colors.amber,size: 10,);
+      return Icon(
+        Icons.circle,
+        color: Colors.amber,
+        size: 10,
+      );
     }
   }
 }
