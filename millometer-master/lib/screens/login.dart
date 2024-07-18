@@ -138,7 +138,7 @@ class _PhoneLoginState extends State<PhoneLogin> {
           Row(
             children: [
               Image.asset(
-                "image/malaysia.png",
+                "assets/malaysia.png",
                 width: 30,
                 height: 30,
                 fit: BoxFit.contain,
@@ -341,7 +341,7 @@ class _OTPPageState extends State<OTPPage> {
             children: [
               // Add your logo here
               Image.asset(
-                "image/upmlogo.jpg", // Replace with your image asset
+                "assets/upmlogo.png", // Replace with your image asset
                 height: 100,
               ),
               const SizedBox(height: 20),
