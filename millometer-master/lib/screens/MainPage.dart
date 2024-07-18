@@ -1,4 +1,3 @@
-// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:mill_project/widgets/mills.dart';
 import 'package:mill_project/widgets/home.dart';
