@@ -9,7 +9,8 @@ class AddUser extends StatefulWidget {
 }
 
 class _AddUserState extends State<AddUser> {
-  String userInput = '';
+  String name = '';
+  String phoneNum = '';
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class _AddUserState extends State<AddUser> {
               child: Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
-                color: Colors.transparent,
+                color: Colors.grey,
               ),
             ),
             Positioned(
@@ -75,7 +76,7 @@ class _AddUserState extends State<AddUser> {
                     TextField(
                       onChanged: (value) {
                         setState(() {
-                          userInput = value;
+                          name = value;
                         });
                       },
                       decoration: InputDecoration(
@@ -92,7 +93,7 @@ class _AddUserState extends State<AddUser> {
                     TextField(
                       onChanged: (value) {
                         setState(() {
-                          userInput = value;
+                          phoneNum = value;
                         });
                       },
                       decoration: InputDecoration(
@@ -105,11 +106,12 @@ class _AddUserState extends State<AddUser> {
                       alignment: Alignment.center,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Do something with the user input if needed
-                          print('User input: $userInput');
-
-                          // Close the floating widget
-                          Navigator.pop(context);
+                          Navigator.pop(context, {
+                            'name': name,
+                            'phoneNum': phoneNum,
+                            'status':
+                                1 // Assuming default status as 1 for new users
+                          });
                         },
                         child: SizedBox(
                             height: 50,
