@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mill_project/screens/MainPage.dart';
+import 'package:mill_project/screens/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
         primarySwatch: Colors.blue,
       ),
-      home: const MainPage(),
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }
