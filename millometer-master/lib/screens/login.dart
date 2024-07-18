@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mill_project/screens/MainPage.dart';
-import 'package:mill_project/widgets/home.dart';
 import 'background.dart';
-import 'package:mill_project/main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
