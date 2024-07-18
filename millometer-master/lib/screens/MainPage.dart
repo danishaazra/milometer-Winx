@@ -1,4 +1,3 @@
-// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:mill_project/widgets/mills.dart';
 import 'package:mill_project/widgets/home.dart';
@@ -14,23 +13,20 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int selectedMillIndex = 0;
+  String selectedMillID = 'ABC12345';
 
   void _onMillSelected(int index) {
     setState(() {
       selectedMillIndex = index;
+      selectedMillID = millList()[index].raspberrypi_id;
     });
 
     // Get the selected mill's label from the millList
     String selectedLabel = millList()[index].label;
-    String selectedmillID = millList()[index].raspberrypi_id;
     // Set the AppBar title to the selected label
-    _setAppBarTitle(selectedLabel, selectedmillID);
-    _widgetOptions.removeAt(1);
-    _widgetOptions.insert(
-        1,
-        HomeWidget(
-          millID: selectedmillID,
-        ));
+    _setAppBarTitle(selectedLabel, selectedMillID);
+    _widgetOptions[0] = UserList(millID: selectedMillID);
+    _widgetOptions[1] = HomeWidget(millID: selectedMillID);
   }
 
   void _setAppBarTitle(String title, String millID) {
@@ -55,9 +51,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   List<Widget> _widgetOptions = <Widget>[
-    UserList(),
+    UserList(millID: 'ABC12345'), // Initial millID
     HomeWidget(
-      millID: '',
+      millID: 'ABC12345',
     ),
     Settings(),
   ];
