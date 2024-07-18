@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mill_project/screens/MainPage.dart';
-import 'package:mill_project/screens/login.dart';
 import 'package:mill_project/widgets/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
