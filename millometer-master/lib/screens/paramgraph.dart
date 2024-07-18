@@ -57,7 +57,7 @@ class _ParamGraphState extends State<ParamGraph> {
                 child: Center(
                   child: Text(
                     widget.paramtype,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 20,
                         height: 0.6,
@@ -66,7 +66,7 @@ class _ParamGraphState extends State<ParamGraph> {
                 ),
               ),
               Graph(chartData: chartdata),
-              Calendar()
+              const Calendar()
             ],
           ),
         ));
@@ -91,7 +91,7 @@ class Calendar extends StatelessWidget {
                 color: Colors.grey.withOpacity(0.5), // Shadow color
                 spreadRadius: 2, // Spread radius of the shadow
                 blurRadius: 4, // Blur radius of the shadow
-                offset: Offset(0, 3), // Offset of the shadow
+                offset: const Offset(0, 3), // Offset of the shadow
               )
             ]),
         child: SfDateRangePicker(
@@ -175,7 +175,7 @@ class _GraphState extends State<Graph> {
                     color: Colors.grey.withOpacity(0.3), // Shadow color
                     spreadRadius: 2, // Spread radius of the shadow
                     blurRadius: 4, // Blur radius of the shadow
-                    offset: Offset(0, 1), // Offset of the shadow
+                    offset: const Offset(0, 1), // Offset of the shadow
                   )
                 ]),
             child: Padding(
@@ -183,33 +183,33 @@ class _GraphState extends State<Graph> {
               child: Row(
                 
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.circle,
                     color: Colors.blue,
                     size: 15,
                   ),
-                  Text('  Max'),
-                  SizedBox(width: 10,),
-                  Icon(
+                  const Text('  Max'),
+                  const SizedBox(width: 10,),
+                  const Icon(
                     Icons.circle,
                     color: Colors.amber,
                     size: 15,
                   ),
-                  Text('  Average'),
-                  SizedBox(width: 10,),
+                  const Text('  Average'),
+                  const SizedBox(width: 10,),
                   Icon(
                     Icons.circle,
                     color: Colors.blue[200],
                     size: 15,
                   ),
-                  Text('  Minimum'),
-                  SizedBox(width: 10,),
-                  Icon(
+                  const Text('  Minimum'),
+                  const SizedBox(width: 10,),
+                  const Icon(
                     Icons.circle,
                     color: Colors.red,
                     size: 15,
                   ),
-                  Text('  Threshold'),
+                  const Text('  Threshold'),
                 ],
               ),
             ),
