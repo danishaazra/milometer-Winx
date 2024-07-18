@@ -9,8 +9,7 @@ class AddUser extends StatefulWidget {
 }
 
 class _AddUserState extends State<AddUser> {
-  String name = '';
-  String phoneNum = '';
+  String userInput = '';
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +29,7 @@ class _AddUserState extends State<AddUser> {
               child: Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
-                color: Colors.grey,
+                color: Colors.transparent,
               ),
             ),
             Positioned(
@@ -76,7 +75,7 @@ class _AddUserState extends State<AddUser> {
                     TextField(
                       onChanged: (value) {
                         setState(() {
-                          name = value;
+                          userInput = value;
                         });
                       },
                       decoration: InputDecoration(
@@ -93,7 +92,7 @@ class _AddUserState extends State<AddUser> {
                     TextField(
                       onChanged: (value) {
                         setState(() {
-                          phoneNum = value;
+                          userInput = value;
                         });
                       },
                       decoration: InputDecoration(
@@ -106,12 +105,11 @@ class _AddUserState extends State<AddUser> {
                       alignment: Alignment.center,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context, {
-                            'name': name,
-                            'phoneNum': phoneNum,
-                            'status':
-                                1 // Assuming default status as 1 for new users
-                          });
+                          // Do something with the user input if needed
+                          print('User input: $userInput');
+
+                          // Close the floating widget
+                          Navigator.pop(context);
                         },
                         child: SizedBox(
                             height: 50,
@@ -132,5 +130,3 @@ class _AddUserState extends State<AddUser> {
     );
   }
 }
-
-// hello
