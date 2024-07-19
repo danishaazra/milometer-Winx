@@ -1,18 +1,69 @@
 import 'package:flutter/material.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({super.key});
+  final Map<String, Map<String, double>> thresholds;
+  final String selectedMillID;
+  final ValueChanged<Map<String, double>> onThresholdUpdated;
+  final Map<String, String> factoryNames;
+
+  const Settings({
+    super.key,
+    required this.thresholds,
+    required this.selectedMillID,
+    required this.onThresholdUpdated,
+    required this.factoryNames,
+  });
 
   @override
   State<Settings> createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
-  bool vibrate =
-      true; //need to retrieve from saved state from the device settings
-  bool notification =
-      true; //need to retrieve from saved state from the device settings
-  String tone = 'None';
+  late Map<String, double> currentThresholds;
+  late Map<String, TextEditingController> controllers;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize currentThresholds and controllers
+    currentThresholds = Map.from(widget.thresholds[widget.selectedMillID] ?? {});
+    controllers = {
+      'Steam Pressure': TextEditingController(text: currentThresholds['Steam Pressure']?.toString() ?? '0.0'),
+      'Steam Flow': TextEditingController(text: currentThresholds['Steam Flow']?.toString() ?? '0.0'),
+      'Water Level': TextEditingController(text: currentThresholds['Water Level']?.toString() ?? '0.0'),
+      'Turbine Frequency': TextEditingController(text: currentThresholds['Turbine Frequency']?.toString() ?? '0.0'),
+    };
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers to prevent memory leaks
+    controllers.forEach((_, controller) => controller.dispose());
+    super.dispose();
+  }
+
+  void _updateThreshold(String paramtype, double value) {
+    setState(() {
+      currentThresholds[paramtype] = value;
+      controllers[paramtype]?.text = value.toString();
+      
+      // Fetch the factory name from the mapping
+      String factoryName = widget.factoryNames[widget.selectedMillID] ?? 'Factory';
+      
+      // Debugging: Print factoryName to console
+      print('Selected Mill ID: ${widget.selectedMillID}');
+      print('Factory Name: $factoryName');
+      
+      // Show a SnackBar with the update notification
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$paramtype updated to $value to the $factoryName'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Flexible(
@@ -24,10 +75,10 @@ class _SettingsState extends State<Settings> {
           borderRadius: BorderRadius.circular(13),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5), // Shadow color
-              spreadRadius: 2, // Spread radius of the shadow
-              blurRadius: 4, // Blur radius of the shadow
-              offset: Offset(0, 3), // Offset of the shadow
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 4,
+              offset: Offset(0, 3),
             )
           ],
         ),
@@ -36,7 +87,7 @@ class _SettingsState extends State<Settings> {
           padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start, //check
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -49,13 +100,13 @@ class _SettingsState extends State<Settings> {
                               fontWeight: FontWeight.w700, fontSize: 20),
                         ),
                         Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.info_outline),
-                              tooltip:
-                                  'Values lower than the \nvalues specified here will\ntrigger the alert.',
-                            ))
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.info_outline),
+                            tooltip: 'Values lower than the \nvalues specified here will\ntrigger the alert.',
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -72,125 +123,65 @@ class _SettingsState extends State<Settings> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ParamSetting(
-                              millID: '',
                               paramtype: 'Steam\nPressure',
                               unit: 'bar',
-                              threshold: 30,
+                              threshold: currentThresholds['Steam Pressure'] ?? 0.0,
+                              controller: controllers['Steam Pressure']!,
+                              onThresholdChanged: (value) {
+                                _updateThreshold('Steam Pressure', value);
+                              },
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
+                            SizedBox(height: 10),
                             ParamSetting(
-                                millID: '',
-                                paramtype: 'Water\nLevel',
-                                threshold: 42,
-                                unit: '%')
+                              paramtype: 'Water\nLevel',
+                              threshold: currentThresholds['Water Level'] ?? 0.0,
+                              unit: '%',
+                              controller: controllers['Water Level']!,
+                              onThresholdChanged: (value) {
+                                _updateThreshold('Water Level', value);
+                              },
+                            ),
                           ],
                         ),
                       ),
-                      SizedBox(
-                        width: 20,
-                      ),
+                      SizedBox(width: 20),
                       Flexible(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ParamSetting(
-                                millID: '',
-                                paramtype: 'Steam\nFlow',
-                                threshold: 29,
-                                unit: 'T/H'),
-                            SizedBox(
-                              height: 10,
+                              paramtype: 'Steam\nFlow',
+                              threshold: currentThresholds['Steam Flow'] ?? 0.0,
+                              unit: 'T/H',
+                              controller: controllers['Steam Flow']!,
+                              onThresholdChanged: (value) {
+                                _updateThreshold('Steam Flow', value);
+                              },
                             ),
+                            SizedBox(height: 10),
                             ParamSetting(
-                                millID: '',
-                                paramtype: 'Turbine\nFrequency',
-                                threshold: 50,
-                                unit: 'Hz')
+                              paramtype: 'Turbine\nFrequency',
+                              threshold: currentThresholds['Turbine Frequency'] ?? 0.0,
+                              unit: 'Hz',
+                              controller: controllers['Turbine Frequency']!,
+                              onThresholdChanged: (value) {
+                                _updateThreshold('Turbine Frequency', value);
+                              },
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                  'Sound & Vibrations',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
-                ),
+              ElevatedButton(
+                onPressed: () {
+                  widget.onThresholdUpdated(currentThresholds);
+                  print('Threshold values saved: ${currentThresholds}');
+                },
+                child: Text('Submit'),
               ),
-              Flexible(
-                flex: 5,
-                child: Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          'Vibrate',
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: Color.fromARGB(255, 104, 104, 104)),
-                        ),
-                        Text(
-                          'Show notifications',
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: Color.fromARGB(255, 104, 104, 104)),
-                        ),
-                        Text(
-                          'Sound',
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: Color.fromARGB(255, 104, 104, 104)),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      width: 80,
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Transform.scale(
-                          scale: 1.2,
-                          child: Switch(
-                            // This bool value toggles the switch.
-                            value: vibrate,
-                            activeColor: Colors.blue,
-                            onChanged: (bool value) {
-                              // This is called when the user toggles the switch.
-                              setState(() {
-                                vibrate = value;
-                              });
-                            },
-                          ),
-                        ),
-                        Transform.scale(
-                          scale: 1.2,
-                          child: Switch(
-                            // This bool value toggles the switch.
-                            value: notification,
-                            activeColor: Colors.blue,
-                            onChanged: (bool value) {
-                              // This is called when the user toggles the switch.
-                              setState(() {
-                                notification = value;
-                              });
-                            },
-                          ),
-                        ),
-                        TextButton(onPressed: () {}, child: Text(tone))
-                      ],
-                    ),
-                  ],
-                ),
-              )
             ],
           ),
         ),
@@ -199,83 +190,55 @@ class _SettingsState extends State<Settings> {
   }
 }
 
-class ParamSetting extends StatefulWidget {
-  final String millID;
+class ParamSetting extends StatelessWidget {
   final String paramtype;
-  final int threshold;
   final String unit;
+  final double threshold;
+  final TextEditingController controller;
+  final ValueChanged<double> onThresholdChanged;
+
   const ParamSetting({
     super.key,
-    required this.millID,
     required this.paramtype,
     required this.threshold,
     required this.unit,
+    required this.controller,
+    required this.onThresholdChanged,
   });
 
   @override
-  State<ParamSetting> createState() => _ParamSettingState();
-}
-
-class _ParamSettingState extends State<ParamSetting> {
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          widget.paramtype,
-          maxLines: 2,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 20,
-              color: Color.fromARGB(255, 104, 104, 104),
-              height: 1.2),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            SizedBox(
-                width: 80,
-                height: 50,
-                child: TextField(
-                  decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            bottomLeft: Radius.circular(
-                                10)), // Set the border radius here
-                      ),
-                      hintText: widget.threshold.toString(),
-                      hintStyle: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.w700,
-                          height: 1)),
-                  textAlign: TextAlign.right,
-                  textAlignVertical: TextAlignVertical.center,
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
-                )),
-            Container(
-                width: 40,
-                height: 50,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(10),
-                        bottomRight: Radius.circular(10))),
-                child: Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      widget.unit,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    )))
+            Text(
+              paramtype,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15),
+            ),
+            TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: 'Threshold ($unit)',
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                double? newValue = double.tryParse(value);
+                if (newValue != null) {
+                  onThresholdChanged(newValue);
+                }
+              },
+            ),
           ],
         ),
-      ],
+      ),
     );
   }
 }
