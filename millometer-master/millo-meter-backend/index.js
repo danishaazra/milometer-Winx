@@ -328,47 +328,37 @@ app.post("/api/thresholds", authMiddleware, async (req, res) => {
 });
 
 // Example to add engineers to a factory
-app.post(
-  "/api/factories/:factoryId/engineers",
-  authMiddleware,
-  async (req, res) => {
-    const { factoryId } = req.params;
-    const { engineers } = req.body;
+app.post("/api/factories/:raspberrypi_id/engineers", async (req, res) => {
+  const { raspberrypi_id } = req.params;
+  const { name, phoneNum } = req.body;
 
-    try {
-      const factory = await Factory.findById(factoryId);
-      if (!factory) {
-        return res.status(404).json({ message: "Factory not found" });
-      }
-
-      // Add engineers to the factory
-      factory.engineers.push(...engineers);
-      await factory.save();
-
-      res
-        .status(200)
-        .json({ message: "Engineers added successfully", factory });
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  }
-);
-
-// GET all engineers for a specific factory
-app.get("/api/engineers/:factoryId", async (req, res) => {
   try {
-    const { factoryId } = req.params;
-
-    // Query the factory by factoryId
-    const factory = await Factory.findById(factoryId).select("engineers");
-
+    const factory = await Factory.findOne({ raspberrypi_id });
     if (!factory) {
       return res.status(404).json({ message: "Factory not found" });
     }
 
-    // Extract engineers from the factory
-    const engineers = factory.engineers;
+    // Add engineer to the factory
+    factory.engineers.push({ name, phoneNum });
+    await factory.save();
 
+    res.status(200).json({ message: "Engineer added successfully", factory });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route to get engineers for a specific factory
+app.get("/api/engineers/:raspberrypi_id", async (req, res) => {
+  try {
+    const { raspberrypi_id } = req.params;
+
+    const factory = await Factory.findOne({ raspberrypi_id }).select("engineers");
+    if (!factory) {
+      return res.status(404).json({ message: "Factory not found" });
+    }
+
+    const engineers = factory.engineers;
     res.status(200).json(engineers);
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -49,10 +49,13 @@ class _MainPageState extends State<MainPage> {
 
     String selectedLabel = millList()[index].label;
     String selectedMillID = millList()[index].raspberrypi_id;
+
     Map<String, double> selectedInitialValues = initialValues[selectedMillID]!;
     Map<String, double> selectedThresholdValues = thresholds[selectedLabel]!;
 
     _setAppBarTitle(selectedLabel, selectedMillID);
+
+    _widgetOptions[0] = UserList(factoryId: selectedMillID);
 
     _widgetOptions[1] = HomeWidget(
       millID: selectedMillID,
@@ -63,8 +66,9 @@ class _MainPageState extends State<MainPage> {
     _widgetOptions[2] = Settings(
       thresholds: thresholds,
       selectedMillID: selectedMillID,
-      onThresholdUpdated: (newThresholds) => _updateThresholds(newThresholds, selectedLabel),
-      factoryNames: factoryNames,  // Ensure this is passed correctly
+      onThresholdUpdated: (newThresholds) =>
+          _updateThresholds(newThresholds, selectedLabel),
+      factoryNames: factoryNames, // Ensure this is passed correctly
     );
   }
 
@@ -97,7 +101,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   final List<Widget> _widgetOptions = <Widget>[
-    const UserList(),
+    const UserList(factoryId: 'ABC12345'),
     HomeWidget(
       millID: '',
       initialValues: {},

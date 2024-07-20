@@ -1,22 +1,50 @@
 // detail_screen.dart
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AddUser extends StatefulWidget {
+  final String factoryId;
+  AddUser({required this.factoryId});
+
   @override
   _AddUserState createState() => _AddUserState();
 }
 
 class _AddUserState extends State<AddUser> {
-  String userInput = '';
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+
+  Future<void> _submitEngineer() async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'http://10.106.18.52:5000/api/factories/${widget.factoryId}/engineers'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'name': _nameController.text,
+          'phoneNum': _phoneController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Navigator.pop(context, true);
+      } else {
+        print('Failed to add engineer: ${response.body}');
+      }
+    } catch (e) {
+      print('Exception occurred: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     return GestureDetector(
       onTap: () {
-        // Close the floating widget when tapping outside the content area
         Navigator.pop(context);
       },
       child: Material(
@@ -64,20 +92,16 @@ class _AddUserState extends State<AddUser> {
                     Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'Invite User',
+                          'Invite Engineer',
                           style: TextStyle(fontSize: 14),
                         )),
                     Text(
-                      'Owner\'s Name : ',
+                      'Engineer\'s Name : ',
                       style: TextStyle(fontSize: 18),
                     ),
                     SizedBox(height: 10),
                     TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          userInput = value;
-                        });
-                      },
+                      controller: _nameController,
                       decoration: InputDecoration(
                         hintText: 'Type here...',
                         border: OutlineInputBorder(),
@@ -85,16 +109,12 @@ class _AddUserState extends State<AddUser> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      'Owner\'s Phone Number : ',
+                      'Engineer\'s Phone Number : ',
                       style: TextStyle(fontSize: 18),
                     ),
                     SizedBox(height: 10),
                     TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          userInput = value;
-                        });
-                      },
+                      controller: _phoneController,
                       decoration: InputDecoration(
                         hintText: 'Type here...',
                         border: OutlineInputBorder(),
@@ -104,13 +124,7 @@ class _AddUserState extends State<AddUser> {
                     Align(
                       alignment: Alignment.center,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // Do something with the user input if needed
-                          print('User input: $userInput');
-
-                          // Close the floating widget
-                          Navigator.pop(context);
-                        },
+                        onPressed: _submitEngineer,
                         child: SizedBox(
                             height: 50,
                             child: Center(
