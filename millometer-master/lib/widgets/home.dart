@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
 import 'ParamContainer.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -27,6 +27,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   late double turbineFrequencyValue;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
   late String currentTime;
   late Timer timer;
 
@@ -36,7 +37,6 @@ class _HomeWidgetState extends State<HomeWidget> {
     _initializeValues();
     _initializeNotifications();
     _initializeCurrentTime();
-    _updateValuesPeriodically(); // Add this line
   }
 
   void _initializeValues() {
@@ -69,26 +69,9 @@ class _HomeWidgetState extends State<HomeWidget> {
     });
   }
 
-  void _updateValuesPeriodically() {
-    timer = Timer.periodic(Duration(minutes: 10), (Timer t) {
-      setState(() {
-        steamPressureValue = _getNewValue(); // Replace with actual logic
-        steamFlowValue = _getNewValue(); // Replace with actual logic
-        waterLevelValue = _getNewValue(); // Replace with actual logic
-        turbineFrequencyValue = _getNewValue(); // Replace with actual logic
-      });
-      _checkThresholds();
-    });
-  }
-
-  double _getNewValue() {
-    // Replace this with actual logic to get a new value
-    return (steamPressureValue + 5) % 100; // Example logic
-  }
-
   @override
   void dispose() {
-    timer.cancel(); // Ensure to cancel any active timers
+    timer.cancel();
     super.dispose();
   }
 
@@ -117,7 +100,6 @@ class _HomeWidgetState extends State<HomeWidget> {
     final steamFlowThreshold = thresholdValues['Steam Flow'];
     final waterLevelThreshold = thresholdValues['Water Level'];
     final turbineFrequencyThreshold = thresholdValues['Turbine Frequency'];
-
     if (steamPressureThreshold != null && steamPressureValue < steamPressureThreshold) {
       _showNotification('Steam Pressure', steamPressureValue, steamPressureThreshold);
       _showBottomSheet('Steam Pressure', steamPressureValue, steamPressureThreshold);
@@ -187,7 +169,6 @@ class _HomeWidgetState extends State<HomeWidget> {
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Flexible(
