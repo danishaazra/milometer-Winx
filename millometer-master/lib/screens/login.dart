@@ -27,54 +27,54 @@ class _LoginPageState extends State<LoginPage> {
     return Background(
       child: SingleChildScrollView(
           child: Container(
-        padding: const EdgeInsets.all(20),
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(
-              "assets/upmlogo.png",
-              width: 170,
-              height: 100,
-              fit: BoxFit.contain,
-            ),
-            const Text(
-              'Welcome!',
-              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-            ),
-            currentState == 1
-                ? PhoneLogin(changeState: changeState)
-                : const OTPPage(
-                    phoneNumber: '',
-                  ),
-            const SizedBox(height: 20),
-            const Center(
-              child: Text(
-                'Disclaimer | Privacy Statement',
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.blue,
+            padding: const EdgeInsets.all(20),
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Colors.white,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.asset(
+                  "assets/upmlogo.png",
+                  width: 170,
+                  height: 100,
+                  fit: BoxFit.contain,
                 ),
-                textAlign: TextAlign.center,
-              ),
+                const Text(
+                  'Welcome!',
+                  style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+                ),
+                currentState == 1
+                    ? PhoneLogin(changeState: changeState)
+                    : const OTPPage(
+                  phoneNumber: '',
+                ),
+                const SizedBox(height: 20),
+                const Center(
+                  child: Text(
+                    'Disclaimer | Privacy Statement',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.blue,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Copyright UPM & Kejuruteraan Mingtak Sawit CSS Sdn.Bhd.',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'Copyright UPM & Kejuruteraan Mingtak Sawit CSS Sdn.Bhd.',
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.black,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      )),
+          )),
     );
   }
 }
@@ -177,7 +177,7 @@ class _PhoneLoginState extends State<PhoneLogin> {
           ),
           const SizedBox(height: 20),
           SizedBox(
-  height: 50,
+            height: 50,
             child: ElevatedButton(
               onPressed: isChecked
                   ? () async {
@@ -199,7 +199,7 @@ class _PhoneLoginState extends State<PhoneLogin> {
                 ),
               ),
             ),
-),
+          ),
         ],
       ),
     );
@@ -207,7 +207,7 @@ class _PhoneLoginState extends State<PhoneLogin> {
 
   // Function to request OTP from backend
   Future<bool> requestOTP(String phoneNumber) async {
-    final url = Uri.parse('http://10.106.29.92:5000/api/otp');
+    final url = Uri.parse('http://10.106.4.65:5000/api/otp');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'phone': phoneNumber});
 
@@ -288,7 +288,7 @@ class _OTPPageState extends State<OTPPage> {
   }
 
   void activateUser(String otp) async {
-    final url = Uri.parse('http://10.106.29.92:5000/api/activate');
+    final url = Uri.parse('http://10.106.4.65:5000/api/activate');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'phone': widget.phoneNumber,
@@ -299,9 +299,9 @@ class _OTPPageState extends State<OTPPage> {
       final response = await http.post(url, headers: headers, body: body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MainPage(),
-        ));
+            context,
+            MaterialPageRoute(builder: (context) => const MainPage(),
+            ));
       } else {
         _showErrorDialog('Failed to activate user. Please try again.');
       }
@@ -420,12 +420,12 @@ class _OTPPageState extends State<OTPPage> {
                       child: ElevatedButton(
                         onPressed: isFilled
                             ? () {
-                                if (otpController.text.trim().length == 6) {
-                                  activateUser(otpController.text.trim());
-                                } else {
-                                  _showErrorDialog('Please enter a valid OTP.');
-                                }
-                              }
+                          if (otpController.text.trim().length == 6) {
+                            activateUser(otpController.text.trim());
+                          } else {
+                            _showErrorDialog('Please enter a valid OTP.');
+                          }
+                        }
                             : null,
                         child: const Text(
                           'Activate',

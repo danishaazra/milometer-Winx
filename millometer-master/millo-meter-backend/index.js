@@ -344,8 +344,8 @@ app.post("/api/factories/:raspberrypi_id/engineers", async (req, res) => {
 
     // Add engineer to the Users collection
     const newUser = new User({ name, phone: phoneNum });
-    await newUser.save();
-    
+    await newUser.save();
+
     res.status(200).json({ message: "Engineer added successfully", factory });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -398,5 +398,5 @@ app.put(
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(Server is running on http://localhost:${PORT});
 });

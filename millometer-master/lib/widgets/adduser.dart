@@ -21,7 +21,7 @@ class _AddUserState extends State<AddUser> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://10.106.29.92:5000/api/factories/${widget.factoryId}/engineers'),
+            'http://10.106.4.65:5000/api/factories/${widget.factoryId}/engineers'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -160,7 +160,7 @@ class _AddUserState extends State<AddUser> {
       return;
     }
 
-    final url = Uri.parse('http://10.106.29.92:5000/api/register');
+    final url = Uri.parse('http://10.106.4.65:5000/api/register');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'phone': phoneNum});
 
