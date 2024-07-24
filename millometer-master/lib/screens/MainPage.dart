@@ -1,4 +1,3 @@
-// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:mill_project/widgets/mills.dart';
 import 'package:mill_project/widgets/home.dart';
@@ -14,39 +13,86 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int selectedMillIndex = 0;
+  String appBarTitle = "Banting M-1";
+
+  final Map<String, Map<String, double>> thresholds = {
+    'Banting-M1': {
+      'Steam Pressure': 30.0,
+      'Steam Flow': 29.0,
+      'Water Level': 42.0,
+      'Turbine Frequency': 50.0,
+    },
+    'Klang-M1': {
+      'Steam Pressure': 30.0,
+      'Steam Flow': 29.0,
+      'Water Level': 42.0,
+      'Turbine Frequency': 50.0,
+    },
+    'Klang-M2': {
+      'Steam Pressure': 30.0,
+      'Steam Flow': 29.0,
+      'Water Level': 42.0,
+      'Turbine Frequency': 50.0,
+    },
+  };
+
+  final Map<String, String> factoryNames = {
+    'Banting-M1': 'Banting Factory',
+    'Klang-M1': 'Klang Factory',
+    'Klang-M2': 'Klang Factory 2',
+  };
 
   void _onMillSelected(int index) {
     setState(() {
       selectedMillIndex = index;
     });
 
-    // Get the selected mill's label from the millList
     String selectedLabel = millList()[index].label;
-    String selectedmillID = millList()[index].raspberrypi_id;
-    // Set the AppBar title to the selected label
-    _setAppBarTitle(selectedLabel, selectedmillID);
-    _widgetOptions.removeAt(1);
-    _widgetOptions.insert(
-        1,
-        HomeWidget(
-          millID: selectedmillID,
-        ));
+    String selectedMillID = millList()[index].raspberrypi_id;
+
+    Map<String, double> selectedInitialValues = initialValues[selectedMillID]!;
+    Map<String, double> selectedThresholdValues = thresholds[selectedLabel]!;
+
+    _setAppBarTitle(selectedLabel, selectedMillID);
+
+    _widgetOptions[0] = UserList(factoryId: selectedMillID);
+
+    _widgetOptions[1] = HomeWidget(
+      millID: selectedMillID,
+      initialValues: selectedInitialValues,
+      thresholdValues: selectedThresholdValues,
+    );
+
+    _widgetOptions[2] = Settings(
+      thresholds: thresholds,
+      selectedMillID: selectedMillID,
+      onThresholdUpdated: (newThresholds) =>
+          _updateThresholds(newThresholds, selectedLabel),
+      factoryNames: factoryNames, // Ensure this is passed correctly
+    );
   }
 
   void _setAppBarTitle(String title, String millID) {
-    // Update the AppBar title using setState to trigger a UI refresh
     setState(() {
-      appBarTitle = title;
-
-      if (title == '') {
-        appBarTitle = millID;
-      }
+      appBarTitle = title.isEmpty ? millID : title;
     });
   }
 
-  String appBarTitle = "Banting M-1";
+  void _updateThresholds(Map<String, double> newThresholds, String millLabel) {
+    setState(() {
+      thresholds[millLabel] = newThresholds;
+    });
 
-  //routing for bottomNav
+    String selectedMillID = millList()[selectedMillIndex].raspberrypi_id;
+    Map<String, double> selectedInitialValues = initialValues[selectedMillID]!;
+
+    _widgetOptions[1] = HomeWidget(
+      millID: selectedMillID,
+      initialValues: selectedInitialValues,
+      thresholdValues: newThresholds,
+    );
+  }
+
   int _selectedIndex = 1;
   void _onItemTapped(int index) {
     setState(() {
@@ -55,15 +101,23 @@ class _MainPageState extends State<MainPage> {
   }
 
   final List<Widget> _widgetOptions = <Widget>[
-    const UserList(),
-    const HomeWidget(
+    const UserList(factoryId: 'ABC12345'),
+    HomeWidget(
       millID: '',
+      initialValues: {},
+      thresholdValues: {},
     ),
-    const Settings(),
+    Settings(
+      thresholds: {},
+      selectedMillID: '',
+      onThresholdUpdated: (Map<String, double> newThresholds) {},
+      factoryNames: {},
+    ),
   ];
 
   @override
   void initState() {
+    super.initState();
     _onMillSelected(0);
   }
 
@@ -141,26 +195,43 @@ class _MainPageState extends State<MainPage> {
   }
 
   List<Mills> millList({Color selectedshadow = Colors.black}) {
-    List<Mills> mills = [
+    return [
       Mills(
         raspberrypi_id: 'ABC12345',
         label: 'Banting-M1',
-        isSelected: selectedMillIndex ==
-            0, // Set isSelected based on the selectedMillIndex
+        isSelected: selectedMillIndex == 0,
       ),
       Mills(
         raspberrypi_id: 'DEF12345',
         label: 'Klang-M1',
-        isSelected: selectedMillIndex ==
-            1, // Set isSelected based on the selectedMillIndex
+        isSelected: selectedMillIndex == 1,
       ),
       Mills(
         raspberrypi_id: 'XYZ98765',
         label: 'Klang-M2',
-        isSelected: selectedMillIndex ==
-            2, // Set isSelected based on the selectedMillIndex
+        isSelected: selectedMillIndex == 2,
       ),
     ];
-    return mills;
   }
+
+  final Map<String, Map<String, double>> initialValues = {
+    'ABC12345': {
+      'Steam Pressure': 15.0,
+      'Steam Flow': 25.0,
+      'Water Level': 35.0,
+      'Turbine Frequency': 45.0,
+    },
+    'DEF12345': {
+      'Steam Pressure': 20.0,
+      'Steam Flow': 30.0,
+      'Water Level': 40.0,
+      'Turbine Frequency': 50.0,
+    },
+    'XYZ98765': {
+      'Steam Pressure': 25.0,
+      'Steam Flow': 35.0,
+      'Water Level': 45.0,
+      'Turbine Frequency': 55.0,
+    },
+  };
 }
