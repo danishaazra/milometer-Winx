@@ -24,7 +24,7 @@ class _UserListState extends State<UserList> {
   Future<void> _fetchEngineers() async {
     try {
       final response = await http.get(
-        Uri.parse('http://10.106.18.52:5000/api/engineers/${widget.factoryId}'),
+        Uri.parse('http://10.106.29.92:5000/api/engineers/${widget.factoryId}'),
       );
 
       if (response.statusCode == 200) {
@@ -49,7 +49,7 @@ class _UserListState extends State<UserList> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://10.106.18.52:5000/api/factories/${widget.factoryId}/engineers'),
+            'http://10.106.29.92:5000/api/factories/${widget.factoryId}/engineers'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
