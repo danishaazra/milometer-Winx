@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
         primarySwatch: Colors.blue,
       ),
-      home: const MainPage(),
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -178,99 +178,58 @@ class _PhoneLoginState extends State<PhoneLogin> {
           const SizedBox(height: 20),
           SizedBox(
   height: 50,
-  child: ElevatedButton(
-    onPressed: isChecked
-        ? () {
-            // addUser();
-            phoneNumber = phoneController.text.trim();
-            requestOTP(phoneNumber);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => OTPPage(phoneNumber: phoneNumber)),
-            );
-          }
-        : null,
-    child: const Text(
-      'Get Activation Code',
-      style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.normal,
-      ),
-    ),
-  ),
+            child: ElevatedButton(
+              onPressed: isChecked
+                  ? () async {
+                phoneNumber = phoneController.text.trim();
+                bool otpRequested = await requestOTP(phoneNumber);
+                if (otpRequested) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => OTPPage(phoneNumber: phoneNumber)),
+                  );
+                }
+              }
+                  : null,
+              child: const Text(
+                'Get Activation Code',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
 ),
         ],
       ),
     );
   }
 
-  void addUser() async {
-    final String phoneNumber = phoneController.text.trim();
-    if (phoneNumber.isEmpty) {
-      print('Phone number is empty.');
-      return;
-    }
-
-    final url = Uri.parse('http://10.106.4.65:5000/api/register');
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({'phone': phoneNumber});
-
-    print('Sending request to $url with body: $body');
-
-    try {
-      final response = await http.post(url, headers: headers, body: body);
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print('User added successfully');
-        // After user is added successfully, request OTP
-        requestOTP(phoneNumber);
-        // Optionally, you can navigate to OTP verification screen here
-      } else {
-        print('Failed to add user: ${response.statusCode}');
-        // Handle failure to add user
-      }
-    } catch (e) {
-      print('Error adding user: $e');
-      // Handle error
-    }
-  }
-
   // Function to request OTP from backend
-  void requestOTP(String phoneNumber) async {
-    final url = Uri.parse('http://10.106.4.65:5000/api/otp');
+  Future<bool> requestOTP(String phoneNumber) async {
+    final url = Uri.parse('http://10.106.29.92:5000/api/otp');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'phone': phoneNumber});
 
     print('Requesting OTP from $url with body: $body');
 
-    // try {
-    //   final response = await http.post(url, headers: headers, body: body);
-    //   print('OTP request status: ${response.statusCode}');
-    //   print('OTP request body: ${response.body}');
-    //   // Handle OTP request response here
-    // } catch (e) {
-    //   print('Error requesting OTP: $e');
-    //   // Handle error
-    // }
-
     try {
       final response = await http.post(url, headers: headers, body: body);
       if (response.statusCode == 200) {
         print('OTP request successful: ${response.body}');
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => OTPPage(phoneNumber: phoneNumber)),
-        );
+        return true;
       } else if (response.statusCode == 404) {
         _showErrorDialog('Phone number not registered.');
+        return false;
       } else {
         print('OTP request failed: ${response.statusCode}');
         _showErrorDialog('Failed to send OTP. Please try again.');
+        return false;
       }
     } catch (e) {
       print('Error requesting OTP: $e');
       _showErrorDialog('Error requesting OTP. Please try again.');
+      return false;
     }
   }
 
@@ -329,7 +288,7 @@ class _OTPPageState extends State<OTPPage> {
   }
 
   void activateUser(String otp) async {
-    final url = Uri.parse('http://10.106.4.65:5000/api/activate');
+    final url = Uri.parse('http://10.106.29.92:5000/api/activate');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'phone': widget.phoneNumber,
