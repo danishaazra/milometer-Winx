@@ -101,7 +101,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   final List<Widget> _widgetOptions = <Widget>[
-    UserList(factoryId: 'ABC12345'),
+    const UserList(factoryId: 'ABC12345'),
     HomeWidget(
       millID: '',
       initialValues: {},
@@ -213,6 +213,7 @@ class _MainPageState extends State<MainPage> {
       ),
     ];
   }
+
 
   final Map<String, Map<String, double>> initialValues = {
     'ABC12345': {
