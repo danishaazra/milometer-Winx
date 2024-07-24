@@ -1,8 +1,9 @@
-// detail_screen.dart
+// test
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:mill_project/screens/user.dart' as user_model;
 
 class AddUser extends StatefulWidget {
   final String factoryId;
@@ -31,7 +32,10 @@ class _AddUserState extends State<AddUser> {
       );
 
       if (response.statusCode == 200) {
-        Navigator.pop(context, true);
+        final newUser = user_model.User(
+            name: _nameController.text, phoneNum: _phoneController.text);
+        Navigator.pop(
+            context, newUser); // Return the new user to the previous screen
       } else {
         print('Failed to add engineer: ${response.body}');
       }

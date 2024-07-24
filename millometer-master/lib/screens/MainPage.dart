@@ -101,7 +101,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   final List<Widget> _widgetOptions = <Widget>[
-    const UserList(factoryId: 'ABC12345'),
+    UserList(factoryId: 'ABC12345'),
     HomeWidget(
       millID: '',
       initialValues: {},
