@@ -10,13 +10,12 @@ const factorySchema = new mongoose.Schema({
     defaultMin: { type: Number, default: 0 },
     defaultMax: { type: Number, default: 100 },
   },
-  engineers: [{ name: String, specialization: String, phoneNumber: String }],
+  engineers: [{ name: String, phoneNum: String }],
 });
 
 const engineerSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  specialization: { type: String, required: true },
-  phoneNumber: { type: String, required: true },
+  phoneNum: { type: String, required: true },
 });
 
 const Factory = mongoose.model("Factory", factorySchema);

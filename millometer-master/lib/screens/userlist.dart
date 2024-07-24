@@ -1,14 +1,39 @@
+// userlist.dart
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:mill_project/widgets/adduser.dart';
 
 class UserList extends StatefulWidget {
-  const UserList({super.key});
+  final String factoryId;
+  const UserList({super.key, required this.factoryId});
 
   @override
   State<UserList> createState() => _UserListState();
 }
 
 class _UserListState extends State<UserList> {
+  List<dynamic> engineers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEngineers();
+  }
+
+  Future<void> _fetchEngineers() async {
+    final response = await http.get(Uri.parse(
+        'http://10.106.18.52:5000/api/engineers/${widget.factoryId}'));
+
+    if (response.statusCode == 200) {
+      setState(() {
+        engineers = jsonDecode(response.body);
+      });
+    } else {
+      print('Failed to load engineers');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Flexible(
@@ -19,37 +44,15 @@ class _UserListState extends State<UserList> {
         child: Stack(
           children: [
             Positioned.fill(
-              child: ListView(
-                children: [
-                  User(
-                    name: 'User 1',
-                    phoneNum: '+60123456789',
-                    status: 1,
-                  ),
-                  User(
-                    name: 'User 2',
-                    phoneNum: '+60123456781',
-                    status: 0,
-                  ),
-                  User(
-                    name: 'Engineer 1',
-                    phoneNum: '+60123456782',
-                    status: 1,
-                  ),
-                  User(
-                    name: 'Engineer 2',
-                    phoneNum: '+60123456783',
-                  ),
-                  User(
-                    name: 'User 3',
-                    phoneNum: '+60123456784',
-                  ),
-                  User(
-                    name: 'User 4',
-                    phoneNum: '+60123456785',
-                    status: 1,
-                  ),
-                ],
+              child: ListView.builder(
+                itemCount: engineers.length,
+                itemBuilder: (context, index) {
+                  return User(
+                    name: engineers[index]['name'],
+                    phoneNum: engineers[index]['phoneNum'] ?? 'No Phone Number',
+                    status: 1, // or any logic to determine status
+                  );
+                },
               ),
             ),
             Align(
@@ -57,8 +60,17 @@ class _UserListState extends State<UserList> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: FloatingActionButton(
-                  onPressed: () {
-                    _showAddUserScreen(context);
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AddUser(factoryId: widget.factoryId),
+                      ),
+                    );
+                    if (result == true) {
+                      _fetchEngineers();
+                    }
                   },
                   child: Icon(Icons.add),
                 ),
@@ -66,18 +78,6 @@ class _UserListState extends State<UserList> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showAddUserScreen(BuildContext context) {
-    // Use Navigator to push a new widget onto the screen when long-pressed
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return AddUser(); // Replace 'DetailScreen' with the widget you want to show
-        },
       ),
     );
   }
