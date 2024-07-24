@@ -342,6 +342,10 @@ app.post("/api/factories/:raspberrypi_id/engineers", async (req, res) => {
     factory.engineers.push({ name, phoneNum });
     await factory.save();
 
+    // Add engineer to the Users collection
+    const newUser = new User({ name, phone: phoneNum });
+    await newUser.save();
+    
     res.status(200).json({ message: "Engineer added successfully", factory });
   } catch (err) {
     res.status(500).json({ message: err.message });

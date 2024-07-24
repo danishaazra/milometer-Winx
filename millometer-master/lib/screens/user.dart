@@ -1,13 +1,20 @@
-class User{
+class User {
   final String name;
-  final String phone;
+  final String phoneNum;
 
-  User({required this.name, required this.phone});
+  User({required this.name, required this.phoneNum});
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json['name'],
+      phoneNum: json['phoneNum'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'phoneNum': phoneNum,
+      };
 }
 
-List users = [
-  User(name: 'Ben', phone: '+60109219938'),
-  User(name: 'Testing 1', phone: '+6012345667891'),
-  User(name: 'Hello', phone: '+60123456789'),
-];
-
+Map<String, List<User>> factoryContacts = {};

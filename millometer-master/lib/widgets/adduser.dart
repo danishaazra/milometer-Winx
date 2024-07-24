@@ -1,8 +1,9 @@
-// detail_screen.dart
+// test
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:mill_project/screens/user.dart' as user_model;
 
 class AddUser extends StatefulWidget {
   final String factoryId;
@@ -20,7 +21,7 @@ class _AddUserState extends State<AddUser> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://10.106.18.52:5000/api/factories/${widget.factoryId}/engineers'),
+            'http://10.106.29.92:5000/api/factories/${widget.factoryId}/engineers'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -31,7 +32,10 @@ class _AddUserState extends State<AddUser> {
       );
 
       if (response.statusCode == 200) {
-        Navigator.pop(context, true);
+        final newUser = user_model.User(
+            name: _nameController.text, phoneNum: _phoneController.text);
+        Navigator.pop(
+            context, newUser); // Return the new user to the previous screen
       } else {
         print('Failed to add engineer: ${response.body}');
       }
@@ -124,14 +128,19 @@ class _AddUserState extends State<AddUser> {
                     Align(
                       alignment: Alignment.center,
                       child: ElevatedButton(
-                        onPressed: _submitEngineer,
+                        onPressed: () {
+                          _submitEngineer();
+                          addUser();
+                        },
                         child: SizedBox(
-                            height: 50,
-                            child: Center(
-                                child: Text(
+                          height: 50,
+                          child: Center(
+                            child: Text(
                               'Submit',
                               style: TextStyle(fontSize: 18),
-                            ))),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -142,5 +151,34 @@ class _AddUserState extends State<AddUser> {
         ),
       ),
     );
+  }
+
+  void addUser() async {
+    final String phoneNum = _phoneController.text.trim();
+    if (phoneNum.isEmpty) {
+      print('Phone number is empty.');
+      return;
+    }
+
+    final url = Uri.parse('http://10.106.29.92:5000/api/register');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({'phone': phoneNum});
+
+    print('Sending request to $url with body: $body');
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('User added successfully');
+      } else {
+        print('Failed to add user: ${response.statusCode}');
+        // Handle failure to add user
+      }
+    } catch (e) {
+      print('Error adding user: $e');
+      // Handle error
+    }
   }
 }
