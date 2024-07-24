@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'ParamContainer.dart';
@@ -8,11 +10,11 @@ class HomeWidget extends StatefulWidget {
   final Map<String, double> thresholdValues;
 
   const HomeWidget({
-    super.key,
+    Key? key,
     required this.millID,
     required this.initialValues,
     required this.thresholdValues,
-  });
+  }) : super(key: key);
 
   @override
   State<HomeWidget> createState() => _HomeWidgetState();
@@ -25,12 +27,16 @@ class _HomeWidgetState extends State<HomeWidget> {
   late double turbineFrequencyValue;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  late String currentTime;
+  late Timer timer;
 
   @override
   void initState() {
     super.initState();
     _initializeValues();
     _initializeNotifications();
+    _initializeCurrentTime();
+    _updateValuesPeriodically(); // Add this line
   }
 
   void _initializeValues() {
@@ -52,6 +58,38 @@ class _HomeWidgetState extends State<HomeWidget> {
     );
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  void _initializeCurrentTime() {
+    currentTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      setState(() {
+        currentTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+      });
+    });
+  }
+
+  void _updateValuesPeriodically() {
+    timer = Timer.periodic(Duration(minutes: 10), (Timer t) {
+      setState(() {
+        steamPressureValue = _getNewValue(); // Replace with actual logic
+        steamFlowValue = _getNewValue(); // Replace with actual logic
+        waterLevelValue = _getNewValue(); // Replace with actual logic
+        turbineFrequencyValue = _getNewValue(); // Replace with actual logic
+      });
+      _checkThresholds();
+    });
+  }
+
+  double _getNewValue() {
+    // Replace this with actual logic to get a new value
+    return (steamPressureValue + 5) % 100; // Example logic
+  }
+
+  @override
+  void dispose() {
+    timer.cancel(); // Ensure to cancel any active timers
+    super.dispose();
   }
 
   @override
@@ -109,7 +147,6 @@ class _HomeWidgetState extends State<HomeWidget> {
       android: androidPlatformChannelSpecifics,
     );
 
-    // Unique ID based on parameter type
     final int notificationId = DateTime.now().millisecondsSinceEpoch % 10000;
 
     await flutterLocalNotificationsPlugin.show(
@@ -211,7 +248,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               children: [
                 ParamContainer(
                   paramtype: 'Steam Pressure',
-                  max: 50,
+                  max: 100,
                   threshold: widget.thresholdValues['Steam Pressure'] ?? 0.0,
                   unit: 'bar',
                   value: steamPressureValue,
@@ -219,7 +256,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                 ),
                 ParamContainer(
                   paramtype: 'Steam Flow',
-                  max: 50,
+                  max: 100,
                   threshold: widget.thresholdValues['Steam Flow'] ?? 0.0,
                   unit: 'T/H',
                   value: steamFlowValue,
@@ -240,13 +277,20 @@ class _HomeWidgetState extends State<HomeWidget> {
                 ),
                 ParamContainer(
                   paramtype: 'Turbine Frequency',
-                  max: 50,
+                  max: 100,
                   threshold: widget.thresholdValues['Turbine Frequency'] ?? 0.0,
                   unit: 'Hz',
                   value: turbineFrequencyValue,
                   millID: widget.millID,
                 ),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                currentTime,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
